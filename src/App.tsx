@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
@@ -13,7 +13,7 @@ import Perfil from "./pages/Perfil";
 
 function App() {
   return (
-    <BrowserRouter basename="/portal-requerimiento-frontend">
+    <HashRouter>
 
       <Routes>
 
@@ -98,7 +98,7 @@ function App() {
 
       </Routes>
 
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

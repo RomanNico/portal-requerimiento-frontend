@@ -127,7 +127,7 @@ export function formatearPlantilla(texto: string) {
 
     html = html.replace(
         /Prioridad:\s*(Alta|Media|Baja)/gi,
-        (match, p1) => {
+        (_, p1) => {
 
             let color = "priority-media";
 

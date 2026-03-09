@@ -14,6 +14,6 @@ export function logout() {
 
     localStorage.removeItem("usuario");
 
-    window.location.href = "/";
+    window.location.href = "/portal-requerimiento-frontend/";
 
 }
