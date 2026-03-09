@@ -317,6 +317,18 @@ export default function Validacion() {
 
                                     </span>
 
+                                    <div className="val-validaciones">
+
+                                        <span className={`val-chip ${req.check_po ? "ok" : "pendiente"}`}>
+                                            👤 PO: {req.check_po ? "✅" : "⏳"}
+                                        </span>
+
+                                        <span className={`val-chip ${req.check_qa ? "ok" : "pendiente"}`}>
+                                            🛡 QA: {req.check_qa ? "✅" : "⏳"}
+                                        </span>
+
+                                    </div>
+
                                 </div>
 
                                 <div className="val-card-footer">
