@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import volverIcon from "../assets/img/anterior.png";
@@ -24,6 +24,7 @@ type Req = {
 export default function Resultado() {
 
     const { id } = useParams()
+    const navigate = useNavigate()
 
     const [requerimiento, setRequerimiento] = useState<Req | null>(null)
     const [imagenPreview, setImagenPreview] = useState<string | null>(null)
@@ -337,15 +338,14 @@ export default function Resultado() {
                                 : requerimiento?.estado}
                         </div>
 
-                        <Link to="/mis-requerimientos">
+                        <button
+                            className="btn-icon-volver"
+                            onClick={() => navigate(-1)}
+                        >
 
-                            <button className="btn-icon-volver">
+                            <img src={volverIcon} className="img-volver" />
 
-                                <img src={volverIcon} className="img-volver" />
-
-                            </button>
-
-                        </Link>
+                        </button>
 
                     </div>
 
