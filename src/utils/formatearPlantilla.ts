@@ -4,23 +4,17 @@ export function formatearPlantilla(texto: string) {
 
     let html = texto;
 
-    /* limpiar basura de nova */
-
+    /* limpiar texto basura */
     html = html.replace(/Plantilla Final Generada/gi, "");
 
-    /* detectar titulo correcto */
-
+    /* detectar titulo */
     let titulo = "";
-
-    /* prioridad 1: titulo del requerimiento */
 
     const matchTitulo = html.match(/Título del requerimiento:<br>(.*?)<br>/i);
 
     if (matchTitulo) {
         titulo = matchTitulo[1].trim();
     }
-
-    /* prioridad 2: titulo de nova */
 
     if (!titulo) {
 
@@ -32,7 +26,7 @@ export function formatearPlantilla(texto: string) {
 
     }
 
-    /* insertar titulo */
+    /* insertar titulo principal */
 
     if (titulo) {
 
@@ -45,14 +39,14 @@ export function formatearPlantilla(texto: string) {
 
     }
 
-    /* iconos secciones */
+    /* iconos de secciones */
 
     const secciones = [
         { nombre: "Tipo de gestión", icon: "📋" },
         { nombre: "Tipo de solicitud", icon: "🧾" },
         { nombre: "Descripción general del requerimiento", icon: "📄" },
         { nombre: "Descripción breve de la necesidad", icon: "📄" },
-        { nombre: "Problema que se busca resolver", icon: "⚠" },
+        { nombre: "Problema que se busca resolver", icon: "⚠️" },
         { nombre: "Área / proceso impactado", icon: "🏢" },
         { nombre: "Área o proceso impactado", icon: "🏢" },
         { nombre: "Usuarios impactados", icon: "👥" },
@@ -60,26 +54,39 @@ export function formatearPlantilla(texto: string) {
         { nombre: "Descripción del proceso actual", icon: "🔍" },
         { nombre: "Descripción del proceso esperado", icon: "🚀" },
         { nombre: "Descripción del proceso propuesto", icon: "🚀" },
-        { nombre: "Sistemas involucrados", icon: "⚙" },
-        { nombre: "Ambientes y sistemas involucrados", icon: "⚙" },
+        { nombre: "Sistemas involucrados", icon: "⚙️" },
+        { nombre: "Ambientes y sistemas involucrados", icon: "⚙️" },
         { nombre: "Reglas de asignación requeridas", icon: "📑" },
-        { nombre: "Implicaciones si no se realiza", icon: "⚠" },
+        { nombre: "Implicaciones si no se realiza", icon: "⚠️" },
         { nombre: "Impacto en la empresa", icon: "📊" },
         { nombre: "Impacto en la empresa y riesgo operativo", icon: "📊" },
         { nombre: "Beneficios esperados", icon: "✨" },
         { nombre: "Prioridad asignada", icon: "🔥" },
-        { nombre: "Riesgos", icon: "⚠" },
+        { nombre: "Riesgos", icon: "⚠️" },
         { nombre: "Dependencias", icon: "🔗" },
         { nombre: "Alcance", icon: "📦" },
-        { nombre: "Alcance (qué incluye y qué no incluye):", icon: "📦" },
+        { nombre: "Alcance (qué incluye y qué no incluye)", icon: "📦" },
         { nombre: "Exclusiones", icon: "🚫" },
         { nombre: "Criterios de aceptación", icon: "✅" },
         { nombre: "Autor del requerimiento", icon: "👤" },
         { nombre: "Área técnica responsable del desarrollo", icon: "💻" },
-        { nombre: "Centro de costos", icon: "🏷" },
+        { nombre: "Centro de costos", icon: "🏷️" },
         { nombre: "Adjuntos", icon: "📎" },
         { nombre: "Observaciones adicionales", icon: "📝" }
     ];
+
+    /* convertir secciones en títulos con emoji */
+
+    secciones.forEach(sec => {
+
+        const regex = new RegExp(`${sec.nombre}:`, "gi");
+
+        html = html.replace(
+            regex,
+            `<h2 class="doc-section">${sec.icon} ${sec.nombre}</h2>`
+        );
+
+    });
 
     /* etiquetas en negrita */
 
@@ -103,27 +110,19 @@ export function formatearPlantilla(texto: string) {
 
     });
 
-    secciones.forEach(sec => {
-
-        const regex = new RegExp(`${sec.nombre}:`, "gi");
-
-        html = html.replace(
-            regex,
-            `<h2 class="doc-section">${sec.icon} ${sec.nombre}</h2>`
-        );
-
-    });
-
     /* listas */
 
     html = html.replace(/– /g, "<li>");
     html = html.replace(/- /g, "<li>");
+    html = html.replace(/• /g, "<li>");
 
     html = html.replace(/<li>(.*?)<br>/g, "<li>$1</li>");
 
+    /* agrupar listas */
+
     html = html.replace(/(<li>.*?<\/li>)/g, "<ul>$1</ul>");
 
-    /* prioridad */
+    /* prioridad visual */
 
     html = html.replace(
         /Prioridad:\s*(Alta|Media|Baja)/gi,
