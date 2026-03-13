@@ -59,7 +59,6 @@ export default function ValidacionRequerimiento() {
 
     }, []);
 
-
     async function actualizarValidacion(nuevoPO: boolean, nuevoQA: boolean) {
 
         if (!id || !requerimiento) return;
@@ -76,7 +75,6 @@ export default function ValidacionRequerimiento() {
         await guardarValidacion(id, nuevoPO, nuevoQA);
 
     }
-
 
     function irValidacion() {
         navigate("/validacion");
@@ -121,7 +119,7 @@ export default function ValidacionRequerimiento() {
                 }
             );
 
-            alert("❌ Requerimiento ${requerimiento.id} rechazado");
+            alert(`❌ Requerimiento ${requerimiento.id} rechazado`);
 
             navigate("/validacion");
 
@@ -176,9 +174,12 @@ export default function ValidacionRequerimiento() {
 
             if (!response.success) {
 
-                console.error(response);
+                const mensaje =
+                    response?.mensaje ||
+                    response?.error ||
+                    "Error enviando a JIRA";
 
-                alert("❌ Error enviando a JIRA");
+                alert(`⚠️ ${mensaje}`);
 
                 return;
 
@@ -192,15 +193,21 @@ export default function ValidacionRequerimiento() {
                     fecha_envio_jira: new Date().toLocaleString()
                 }
             );
+
             alert(`✅ Requerimiento ${requerimiento.id} enviado a Jira!\n🎫 Ticket en Jira: ${response.issueKey}`);
 
             navigate("/validacion");
 
-        } catch (error) {
+        } catch (error: any) {
 
             console.error(error);
 
-            alert("❌ Error enviando a JIRA");
+            const mensaje =
+                error?.response?.data?.mensaje ||
+                error?.response?.data?.error ||
+                "Error enviando a JIRA";
+
+            alert(`❌ ${mensaje}`);
 
         }
 
@@ -211,7 +218,6 @@ export default function ValidacionRequerimiento() {
         <div>
 
             <Navbar />
-
 
             <main className="main-content">
 
@@ -224,7 +230,6 @@ export default function ValidacionRequerimiento() {
                     </p>
 
                 </section>
-
 
                 <section className="result-card">
 
@@ -241,9 +246,7 @@ export default function ValidacionRequerimiento() {
                             <div className="card-top-bar">
 
                                 <div className={`status-badge ${requerimiento.estado.toLowerCase().replace(/\s/g, "")}`}>
-
                                     {requerimiento.estado}
-
                                 </div>
 
                                 <button
@@ -255,7 +258,6 @@ export default function ValidacionRequerimiento() {
                                 </button>
 
                             </div>
-
 
                             <div className="document-preview">
 
@@ -287,13 +289,11 @@ export default function ValidacionRequerimiento() {
 
                             </div>
 
-
                             <div className="validation-panel">
 
                                 <h3>Controles de Validación</h3>
 
                                 <div className="check-group">
-
 
                                     {rol === "po" && (
                                         <label className="check-card">
@@ -335,7 +335,6 @@ export default function ValidacionRequerimiento() {
 
                                 </div>
 
-
                                 <div className="reject-reason-container">
 
                                     <label
@@ -353,7 +352,6 @@ export default function ValidacionRequerimiento() {
                                 </div>
 
                             </div>
-
 
                             <div className="actions-buttons">
 
