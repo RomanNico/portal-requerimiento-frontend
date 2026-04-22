@@ -6,19 +6,53 @@ import logo from "../assets/img/logo blanco.png";
 import avatar from "../assets/img/avatar.png";
 import logoutIcon from "../assets/img/log-out.png";
 
+/**
+ * Componente de barra de navegación superior.
+ *
+ * Características:
+ * - Muestra logo de la aplicación
+ * - Links de navegación condicionales por rol
+ * - Toggle de tema claro/oscuro (guardado en localStorage)
+ * - Avatar con iniciales del usuario
+ * - Botón de logout (limpia sesión local y/o SSO)
+ *
+ * @component
+ */
 export default function Navbar() {
 
     const { instance } = useMsal();
+    /**
+     * Rol del usuario actual (determina qué enlaces se muestran)
+     */
     const rol = localStorage.getItem("rol");
+    /**
+     * Indica si el usuario inició sesión mediante SSO (tiene datos sso_oid o sso_correo)
+     */
     const esSSO = Boolean(localStorage.getItem("sso_oid") || localStorage.getItem("sso_correo"));
+    /**
+     * Nombre a mostrar (extraído de datos SSO o usuario local)
+     */
     const nombreSSO = localStorage.getItem("sso_nombre") || localStorage.getItem("usuario") || "";
+    /**
+     * Controla la apertura del menú móvil hamburguesa
+     */
     const [menuOpen, setMenuOpen] = useState(false);
+    /**
+     * Tema actual (light/dark) guardado en localStorage
+     */
     const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
+    /**
+     * Cierra el menú móvil
+     */
     function cerrarMenu() {
         setMenuOpen(false);
     }
 
+    /**
+     * Alterna entre tema claro y oscuro.
+     * Aplica el atributo data-theme al <html> y guarda preferencia.
+     */
     const toggleTheme = () => {
         const newTheme = theme === "light" ? "dark" : "light";
         setTheme(newTheme);
@@ -26,11 +60,17 @@ export default function Navbar() {
         localStorage.setItem("theme", newTheme);
     };
 
-    // Inicializar tema
+    // Aplica el tema al montar y cuando cambia
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
     }, [theme]);
 
+    /**
+     * Maneja el cierre de sesión.
+     * - Elimina todos los datos de localStorage (usuario, rol, perfil SSO)
+     * - Si es usuario SSO, redirige a Microsoft logout
+     * - Si es usuario local, redirige directamente a la página de login
+     */
     async function handleLogout() {
         // Limpiamos los datos locales directamente antes de salir
         localStorage.removeItem("usuario");
@@ -52,7 +92,7 @@ export default function Navbar() {
         }
     }
 
-    // Obtener iniciales del nombre para mostrar en avatar
+    // Obtener iniciales del nombre para mostrar en avatar (ej: "Juan Pérez" → "JP")
     const iniciales = nombreSSO
         .split(" ")
         .map((n: string) => n[0])

@@ -5,12 +5,39 @@ import type { PerfilSSO } from "../services/auth";
 import { getPerfil } from "../services/api";
 import Navbar from "../components/Navbar";
 
+/**
+ * Página de perfil de usuario.
+ *
+ * Muestra información completa del usuario autenticado:
+ * - Datos básicos (nombre, correo, usuario, rol)
+ * - Información de Azure AD (cargo, área) si es SSO
+ * - Datos locales (centro de costo) si eslogin tradicional
+ *
+ * Flujo de carga:
+ * 1. Intenta cargar perfil desde localStorage (obtenerPerfilSSO)
+ * 2. Si es usuario SSO, refresca datos desde Microsoft Graph
+ * 3. Si es usuario local, consulta perfil desde API local (/perfil/:usuario)
+ *
+ * @component
+ */
 export default function Perfil() {
 
     const { instance } = useMsal();
+    /**
+     * Perfil completo del usuario (puede venir de SSO o local).
+     */
     const [perfil, setPerfil] = useState<PerfilSSO | null>(null);
+    /**
+     * Indica si el usuario autenticó vía SSO (tiene OID o correo SSO guardado).
+     */
     const esSSO = Boolean(localStorage.getItem("sso_oid") || localStorage.getItem("sso_correo"));
 
+    /**
+     * Carga inicial del perfil al montar el componente.
+     * - Intenta recuperar perfil de localStorage
+     * - Si es SSO, refresca datos desde Graph API (si hay tokens válidos)
+     * - Si es local, consulta API local para datos completos
+     */
     useEffect(() => {
 
         // Cargar perfil desde localStorage (guardado durante SSO login)
@@ -28,6 +55,11 @@ export default function Perfil() {
 
     }, []);
 
+    /**
+     * Carga datos del perfil desde la API local (para usuarios no-SSO).
+     * Consulta endpoint /perfil/:usuario y actualiza estado + localStorage.
+     * @param {string} usuario - Nombre de usuario a buscar
+     */
     async function cargarPerfilLocal(usuario: string) {
         try {
             const resp = await getPerfil(usuario);
@@ -52,6 +84,11 @@ export default function Perfil() {
         }
     }
 
+    /**
+     * Refresca datos del perfil desde Microsoft Graph API.
+     * Obtiene token silencioso y consulta /me para displayName, mail, jobTitle, department.
+     * @param {PerfilSSO} perfilBase - Perfil actual para fallback en valores no encontrados
+     */
     async function cargarDatosMicrosoft(perfilBase: PerfilSSO) {
         try {
             const accounts = instance.getAllAccounts();
@@ -85,8 +122,13 @@ export default function Perfil() {
     }
 
 
-
+    /**
+     * Nombre a mostrar en el encabezado (prioriza nombre real, luego usuario).
+     */
     const nombreMostrado = perfil?.nombre || perfil?.usuario || "Usuario";
+    /**
+     * Iniciales del usuario para avatar (ej: "Juan Pérez" → "JP").
+     */
     const iniciales = nombreMostrado.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase();
 
     return (

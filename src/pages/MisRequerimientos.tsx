@@ -7,6 +7,9 @@ import agregar from "../assets/img/agregar.png";
 import { obtenerUsuario } from "../services/auth";
 import { getRequerimientos } from "../services/api";
 
+/**
+ * Estructura simplificada de un requerimiento en la lista personal.
+ */
 type Requerimiento = {
     id: string
     titulo: string
@@ -14,17 +17,48 @@ type Requerimiento = {
     timestamp_ms: number
 }
 
+/**
+ * Página "Mis Requerimientos" - Vista personal de requerimientos del usuario.
+ *
+ * Funcionalidades:
+ * - Carga solo los requerimientos donde el usuario es el autor
+ * - Búsqueda por título (texto libre)
+ * - Filtrado por estado (dropdown)
+ * - Renderizado como lista de filas con metadatos
+ * - Navegación al detalle (Resultado) al hacer clic
+ *
+ * @component
+ */
 export default function MisRequerimientos() {
 
     const navigate = useNavigate();
 
+    /**
+     * Indicador de carga durante la petición inicial.
+     */
     const [loading, setLoading] = useState(true);
+    /**
+     * Lista completa de requerimientos del usuario (desde API).
+     */
     const [requerimientos, setRequerimientos] = useState<Requerimiento[]>([]);
+    /**
+     * Lista filtrada según búsqueda y estado.
+     */
     const [filtrados, setFiltrados] = useState<Requerimiento[]>([]);
 
+    /**
+     * Texto de búsqueda (filtra por título del requerimiento).
+     */
     const [busqueda, setBusqueda] = useState("");
+    /**
+     * Estado seleccionado para filtrar (vacío = todos).
+     */
     const [estadoFiltro, setEstadoFiltro] = useState("");
 
+    /**
+     * Carga los requerimientos del usuario actual desde la API.
+     * Llama a getRequerimientos("mis", usuario) y sincroniza estado.
+     */
     useEffect(() => {
 
         const usuario = obtenerUsuario();
@@ -57,6 +91,10 @@ export default function MisRequerimientos() {
     }, []);
 
 
+    /**
+     * Efecto para aplicar filtros de búsqueda y estado sobre la lista.
+     * Se ejecuta cada vez que cambian busqueda, estadoFiltro o requerimientos.
+     */
     useEffect(() => {
 
         let lista = requerimientos;
@@ -76,6 +114,9 @@ export default function MisRequerimientos() {
     }, [busqueda, estadoFiltro, requerimientos]);
 
 
+    /**
+     * Navega a la página de creación de nuevo requerimiento.
+     */
     function irNuevo() {
         navigate("/nuevo");
     }

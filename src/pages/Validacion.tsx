@@ -7,6 +7,9 @@ import { getRequerimientos, API_URL } from "../services/api";
 
 import Navbar from "../components/Navbar";
 
+/**
+ * Estructura de un requerimiento en la bandeja de validación.
+ */
 type Requerimiento = {
     id: string
     titulo: string
@@ -18,16 +21,51 @@ type Requerimiento = {
     check_qa?: boolean
 }
 
+/**
+ * Página de bandeja de validación para revisión de requerimientos.
+ *
+ * Características:
+ * - Listado de todos los requerimientos (excepto Finalizados)
+ * - Búsqueda por ID, título, autor o fecha
+ * - Filtrado por estado
+ * - Ordenamiento automático por prioridad (Alta > Media > Baja) y fecha
+ * - Navegación a detalle o validación según rol del usuario
+ * - Acción de finalizar requerimiento (solo usuarios no-manager)
+ *
+ * @component
+ */
 export default function Validacion() {
 
     const navigate = useNavigate();
+    /**
+     * Rol del usuario actual (determina la vista a mostrar)
+     */
     const rol = localStorage.getItem("rol");
 
+    /**
+     * Texto de búsqueda (filtra por ID, título, autor, fecha)
+     */
     const [busqueda, setBusqueda] = useState("");
+    /**
+     * Estado seleccionado para filtrar (null = sin filtro)
+     */
     const [estadoFiltro, setEstadoFiltro] = useState<string | null>(null);
+    /**
+     * Lista completa de requerimientos (cargada desde la API)
+     */
     const [requerimientos, setRequerimientos] = useState<Requerimiento[]>([]);
+    /**
+     * Indicador de carga durante la petición inicial
+     */
     const [loading, setLoading] = useState(true);
 
+    /**
+     * Lista filtrada y ordenada de requerimientos.
+     * Aplica:
+     * - Filtro por texto de búsqueda (ID, título, autor, fecha)
+     * - Filtro por estado (si estadoFiltro está seteado)
+     * - Ordenamiento por prioridad (Alta=1, Media=2, Baja=3) y luego por fecha descendente
+     */
     const requerimientosFiltrados = requerimientos.filter((r) => {
 
         const textoBusqueda = busqueda.toLowerCase();
@@ -49,6 +87,10 @@ export default function Validacion() {
 
     });
 
+    /**
+     * Carga todos los requerimientos desde la API y los ordena.
+     * Filtra requerimientos Finalizados y ordena por prioridad + fecha.
+     */
     async function cargarRequerimientos() {
 
         setLoading(true);
@@ -96,11 +138,12 @@ export default function Validacion() {
 
     }
 
-    useEffect(() => {
-        cargarRequerimientos();
-    }, []);
-
-
+    /**
+     * Abre un requerimiento según el rol del usuario.
+     * - manager → ve la página de resultado/visualización
+     * - otros → ve la página de validación (PO/QA)
+     * @param {string} id - ID del requerimiento
+     */
     function abrirRequerimiento(id: string) {
 
         const rol = localStorage.getItem("rol");
@@ -117,6 +160,12 @@ export default function Validacion() {
 
     }
 
+    /**
+     * Marca un requerimiento como finalizado.
+     * Envía PUT a /requerimientos/finalizar/:id con un comentario.
+     * Recarga la página para actualizar la lista.
+     * @param {string} id - ID del requerimiento a finalizar
+     */
     async function finalizarRequerimiento(id: string) {
 
         const confirmar = window.confirm(
@@ -163,6 +212,13 @@ export default function Validacion() {
 
     }
 
+    /**
+     * Carga inicial de requerimientos al montar el componente.
+     */
+    useEffect(() => {
+        cargarRequerimientos();
+    }, []);
+
     const pendientes = requerimientos.filter(r => r.estado === "Pendiente").length;
     const validacion = requerimientos.filter(r => r.estado === "En validación").length;
     const listoParaEnviar = requerimientos.filter(r => r.estado === "Listo para enviar").length;
@@ -171,6 +227,11 @@ export default function Validacion() {
     const total = requerimientos.length;
     const totalFiltrados = requerimientosFiltrados.length;
 
+    /**
+     * Convierte el nombre del estado a clase CSS para estilos.
+     * @param {string} [estado] - Nombre del estado (Pendiente, En validación, etc.)
+     * @returns {string} Clase CSS correspondiente o cadena vacía
+     */
     function formatearEstado(estado?: string) {
 
         if (!estado) return "";

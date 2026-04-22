@@ -8,6 +8,9 @@ import Navbar from "../components/Navbar";
 
 import DOMPurify from "dompurify";
 
+/**
+ * Estructura de un archivo adjunto en el chat o requerimiento.
+ */
 type FilePreview = {
     nombre?: string
     name?: string
@@ -16,14 +19,32 @@ type FilePreview = {
     data?: string
 }
 
+/**
+ * Estructura de un mensaje en el chat (usuario o bot).
+ */
 type Message = {
     role: "user" | "bot"
     text: string
     files?: FilePreview[]
 }
 
+/**
+ * Página para creación de nuevos requerimientos mediante chat con Nova IA.
+ *
+ * Flujo:
+ * 1. Usuario interactúa con Nova IA a través de un chat conversacional
+ * 2. Nova guía al usuario para completar la información del requerimiento
+ * 3. Al detectar "Plantilla final generada", se extraen los datos automáticamente
+ * 4. Se crea el requerimiento en la BD y se enlaza con el thread de Nova
+ *
+ * @component
+ */
 export default function Nuevo() {
 
+    /**
+     * Array de mensajes del chat. Cada mensaje tiene un rol (user/bot),
+     * texto HTML (para el bot) y archivos adjuntos opcionales.
+     */
     const [messages, setMessages] = useState<Message[]>([
         {
             role: "bot",
@@ -31,16 +52,36 @@ export default function Nuevo() {
         }
     ]);
 
+    /**
+     * Texto actual del input del chat.
+     */
     const [input, setInput] = useState<string>("");
 
+    /**
+     * Indicador de carga mientras se espera respuesta de Nova IA.
+     */
     const [loading, setLoading] = useState<boolean>(false);
 
+    /**
+     * Archivos seleccionados por el usuario para subir al chat.
+     */
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
+    /**
+     * Referencia al contenedor de mensajes para hacer scroll automático.
+     */
     const chatRef = useRef<HTMLDivElement>(null);
 
+    /**
+     * ID único del thread de conversación con Nova IA.
+     * Se deriva del usuario actual en localStorage para mantener consistencia.
+     */
     const threadId = "thread_" + localStorage.getItem("usuario");
 
+    /**
+     * Efecto para hacer scroll al fondo del chat cada vez que cambian los mensajes
+     * o el estado de carga (para mostrar la última respuesta).
+     */
     useEffect(() => {
 
         chatRef.current?.scrollTo({
@@ -52,6 +93,16 @@ export default function Nuevo() {
 
 
 
+    /**
+     * Envía un mensaje del usuario a Nova IA y procesa la respuesta.
+     *
+     * Flujo:
+     * 1. Agrega el mensaje del usuario al chat
+     * 2. Envía el mensaje + archivos adjuntos al endpoint /api/nova
+     * 3. Agrega la respuesta de Nova al chat
+     * 4. Si Nova detecta "Plantilla final generada", extrae los datos del requerimiento
+     *    (título, centro de costo, prioridad) y crea el requerimiento en la BD
+     */
     async function sendMessage() {
 
         if (!input.trim()) return;
@@ -131,6 +182,11 @@ export default function Nuevo() {
     }
 
 
+    /**
+     * Maneja la selección de archivos desde el input file.
+     * Agrega los archivos seleccionados al estado selectedFiles.
+     * @param {React.ChangeEvent<HTMLInputElement>} e - Evento de cambio del input
+     */
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
 
         if (!e.target.files) return;
@@ -354,6 +410,12 @@ export default function Nuevo() {
 FUNCIONES EXTRAER CAMPOS
 ============================= */
 
+/**
+ * Extrae el título del requerimiento a partir de la respuesta de Nova.
+ * Busca patrones como "Título del requerimiento: ..." o la primera línea.
+ * @param {string} texto - Respuesta completa de Nova IA
+ * @returns {string} Título extraído o "Requerimiento sin título" por defecto
+ */
 function extraerTitulo(texto: string) {
 
     if (!texto) return "Requerimiento sin título";
@@ -384,6 +446,12 @@ function extraerTitulo(texto: string) {
 
 }
 
+/**
+ * Extrae el centro de costo de la respuesta de Nova.
+ * Busca la línea que contiene "centro de costos" y retorna la siguiente línea.
+ * @param {string} texto - Respuesta completa de Nova IA
+ * @returns {string|null} Centro de costo extraído o null si no se encuentra
+ */
 function extraerCentroCostoTexto(texto: string) {
 
     if (!texto) return null;
@@ -410,6 +478,13 @@ function extraerCentroCostoTexto(texto: string) {
 
 }
 
+/**
+ * Extrae la prioridad del requerimiento de la respuesta de Nova.
+ * Busca la sección "prioridad" y detecta valores: Alta, Media, Baja.
+ * Retorna "Media" como valor por defecto si no se encuentra.
+ * @param {string} texto - Respuesta completa de Nova IA
+ * @returns {string} Prioridad: "Alta", "Media" o "Baja"
+ */
 function extraerPrioridadTexto(texto: string) {
 
     if (!texto) return "Media";
@@ -442,6 +517,12 @@ function extraerPrioridadTexto(texto: string) {
 
 }
 
+/**
+ * Convierte el texto plano de la plantilla generada por Nova a HTML.
+ * Reemplaza saltos de línea por <br> y elimina marcadores de negrita (**).
+ * @param {string} texto - Texto plano de la plantilla
+ * @returns {string} HTML formateado para almacenar en BD
+ */
 function convertirPlantillaAHTML(texto: string) {
 
     return texto

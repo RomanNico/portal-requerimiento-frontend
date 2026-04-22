@@ -11,6 +11,24 @@ import ValidacionRequerimiento from "./pages/ValidacionRequerimiento";
 import Editar from "./pages/Editar";
 import Perfil from "./pages/Perfil";
 
+/**
+ * Componente raíz de la aplicación.
+ * Configura todas las rutas utilizando HashRouter (por compatibilidad con GitHub Pages).
+ *
+ * Estructura de rutas:
+ * - / → Login (pública)
+ * - /inicio → Dashboard (protegida)
+ * - /mis-requerimientos → Lista personal (protegida)
+ * - /nuevo → Crear requerimiento vía chat (protegida)
+ * - /resultado/:id → Detalle del requerimiento (protegida)
+ * - /perfil → Perfil de usuario (protegida)
+ * - /validacion → Bandeja de validación (roles: admin, manager, qa, po)
+ * - /validacion-requerimiento?id=xxx → Validación detallada (roles: admin, manager, qa, po)
+ * - /editar/:id → Edición de requerimiento (roles: admin, manager, qa, po)
+ * - /* → Fallback a Login (para MSAL redirect)
+ *
+ * @component
+ */
 function App() {
   return (
     <HashRouter>

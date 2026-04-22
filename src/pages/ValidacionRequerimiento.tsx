@@ -9,6 +9,9 @@ import {
     actualizarRequerimiento
 } from "../services/api";
 
+/**
+ * Estructura de un requerimiento para validación.
+ */
 type Req = {
     id: string
     titulo: string
@@ -23,21 +26,58 @@ type Req = {
     comentario?: string
 }
 
+/**
+ * Página de validación de requerimientos (Product Owner y QA).
+ *
+ * Permite:
+ * - Revisar el contenido completo del requerimiento
+ * - Aprobación por PO (Product Owner) y QA (Quality Assurance)
+ * - Rechazar con motivo de rechazo
+ * - Enviar a Jira (solo cuando ambas validaciones están aprobadas)
+ *
+ * Flujo de estados:
+ * - Pendiente → En validación (cuando al menos una validación se marca)
+ * - En validación → Listo para enviar (cuando ambas validaciones están aprobadas)
+ * - En validación → Rechazado (cuando se rechaza)
+ * - Listo para enviar → Enviado (cuando se envía a Jira)
+ *
+ * @component
+ */
 export default function ValidacionRequerimiento() {
 
+    /**
+     * Rol del usuario actual (po, qa, admin, user) desde localStorage.
+     * Determina qué controles de validación se muestran.
+     */
     const rol = localStorage.getItem("rol");
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
+    /**
+     * ID del requerimiento a validar (obtenido de query params).
+     */
     const id = searchParams.get("id");
 
+    /**
+     * Datos del requerimiento cargado desde la API.
+     */
     const [requerimiento, setRequerimiento] = useState<Req | null>(null);
     const [loading, setLoading] = useState(true);
 
+    /**
+     * Checkbox de validación Product Owner.
+     */
     const [po, setPo] = useState(false);
+    /**
+     * Checkbox de validación QA Técnica.
+     */
     const [qa, setQa] = useState(false);
 
+    /**
+     * Carga los datos del requerimiento al montar el componente.
+     * Obtiene check_po y check_qa para inicializar los checkboxes.
+     */
     useEffect(() => {
 
         if (!id) return;
@@ -59,6 +99,12 @@ export default function ValidacionRequerimiento() {
 
     }, []);
 
+    /**
+     * Actualiza el estado de las validaciones PO/QA en el backend.
+     * Muestra confirmación antes de guardar.
+     * @param {boolean} nuevoPO - Nuevo estado de validación PO
+     * @param {boolean} nuevoQA - Nuevo estado de validación QA
+     */
     async function actualizarValidacion(nuevoPO: boolean, nuevoQA: boolean) {
 
         if (!id || !requerimiento) return;
@@ -76,10 +122,16 @@ export default function ValidacionRequerimiento() {
 
     }
 
+    /**
+     * Navega de vuelta a la página de listado de validaciones.
+     */
     function irValidacion() {
         navigate("/validacion");
     }
 
+    /**
+     * Navega a la página de visualización/resultado del requerimiento.
+     */
     function verPDF() {
 
         if (!id) return;
@@ -88,6 +140,9 @@ export default function ValidacionRequerimiento() {
 
     }
 
+    /**
+     * Navega a la página de edición del requerimiento.
+     */
     function editarPDF() {
 
         if (!id) return;
@@ -96,6 +151,11 @@ export default function ValidacionRequerimiento() {
 
     }
 
+    /**
+     * Rechaza un requerimiento, actualizando su estado y guardando el motivo.
+     * Lee el motivo del textarea con id="motivoRechazo".
+     * Actualiza el requerimiento en BD y navega de vuelta a la lista de validación.
+     */
     async function rechazarRequerimiento() {
 
         if (!requerimiento) return;
@@ -133,6 +193,20 @@ export default function ValidacionRequerimiento() {
 
     }
 
+    /**
+     * Aprueba y envía el requerimiento a Jira.
+     * Validaciones:
+     * - Debe tener aprobación de PO
+     * - Debe tener aprobación de QA
+     * - Debe existir centro de costo configurado
+     *
+     * Proceso:
+     * 1. Llama a enviarAJira() para crear ticket en Jira
+     * 2. Si es exitoso, actualiza estado a "Enviado" con fecha de envío
+     * 3. Muestra ticket creado (issueKey) y navega a validación
+     *
+     * @throws {Error} Si falta validación o falla la creación en Jira
+     */
     async function aprobarYEnviar() {
 
         if (!requerimiento) return;

@@ -9,26 +9,55 @@ import { graphRequest, loginRequest } from "../config/msalConfig";
 
 import logo from "../assets/img/logo sin fondo.png";
 
+/**
+ * Página de inicio de sesión.
+ *
+ * Soporta dos métodos de autenticación:
+ * 1. SSO con Microsoft (Azure AD) - método preferido
+ * 2. Login local (usuario/contraseña) - compatibilidad legacy
+ *
+ * Flujo SSO:
+ * - Usa MSAL React con loginRedirect (no popup)
+ * - Redirige a Microsoft para autenticación
+ * - Al regresar, el useEffect detecta autenticación y llama completarLoginSSO()
+ * - completarLoginSSO valida token en backend y obtiene datos de Graph API
+ *
+ * @component
+ */
 export default function Login() {
 
     const navigate = useNavigate();
     const { instance, inProgress } = useMsal();
     const isAuthenticated = useIsAuthenticated();
+
+    /**
+     * Indicador de operación de login en progreso.
+     */
     const [cargando, setCargando] = useState(false);
+    /**
+     * Mensaje de error a mostrar en la UI.
+     */
     const [error, setError] = useState("");
+    /**
+     * Nombre de usuario para login local.
+     */
     const [usuario, setUsuario] = useState("");
+    /**
+     * Contraseña para login local.
+     */
     const [password, setPassword] = useState("");
 
     // ─── EFFECTS ────────────────────────────────────────────────────────
 
-    // 1. Si ya tiene sesión local persistida, ir directamente al inicio
+    // 1. Redirige a /inicio si ya existe sesión local (persistida en localStorage)
     useEffect(() => {
         if (localStorage.getItem("usuario") && !cargando) {
             navigate("/inicio");
         }
     }, []);
 
-    // 2. Si MSAL detecta sesión activa (ej: al volver del redirect), completar el login
+    // 2. Completa el login SSO automáticamente cuando MSAL detecta autenticación
+    // Se ejecuta al regresar del redirect de Microsoft
     useEffect(() => {
         const isPopupWindow = Boolean(window.opener && window.opener !== window);
         if (isPopupWindow) return; 
@@ -39,6 +68,11 @@ export default function Login() {
         }
     }, [isAuthenticated, inProgress]);
 
+    /**
+     * Obtiene datos adicionales del usuario desde Microsoft Graph API.
+     * Complementa la información del token con datos de perfil (cargo, área).
+     * @returns {Promise<any|null>} Objeto con datos de Graph o null si falla
+     */
     async function obtenerPerfilGraph() {
         const account = instance.getActiveAccount() || instance.getAllAccounts()[0];
         if (!account) return null;
@@ -56,6 +90,18 @@ export default function Login() {
         return resp.json();
     }
 
+    /**
+     * Completa el proceso de login SSO después de obtener el token de Microsoft.
+     *
+     * Pasos:
+     * 1. Obtiene ID token desde MSAL
+     * 2. Envía token al backend para validación (/sso-login)
+     * 3. Si es exitoso, obtiene datos extra de Graph API (opcional)
+     * 4. Guarda perfil en localStorage (usuario, rol, cargo, área, etc.)
+     * 5. Navega a /inicio
+     *
+     * @param {boolean} isAutoLogin - Indica si es login automático (sin interacción)
+     */
     async function completarLoginSSO(isAutoLogin: boolean = false) {
         setCargando(true);
         setError("");
@@ -119,6 +165,11 @@ export default function Login() {
         }
     }
 
+    /**
+     * Inicia el flujo de autenticación SSO con Microsoft.
+     * Usa loginRedirect (no popup) debido a restricciones de Azure AD.
+     * El usuario es redirigido a Microsoft y al volver, useEffect[2] completa el login.
+     */
     async function handleLoginSSO() {
         setError("");
         setCargando(true);
@@ -137,6 +188,11 @@ export default function Login() {
         }
     }
 
+    /**
+     * Maneja el login tradicional (usuario/contraseña).
+     * Limpia datos SSO previos y guarda credenciales locales en localStorage.
+     * @param {React.FormEvent} e - Evento del formulario
+     */
     async function handleLoginLocal(e: any) {
         e?.preventDefault?.();
         setError("");

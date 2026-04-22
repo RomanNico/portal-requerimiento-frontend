@@ -6,12 +6,18 @@ import { formatearPlantilla } from "../utils/formatearPlantilla";
 import { getRequerimiento } from "../services/api";
 import Navbar from "../components/Navbar";
 
+/**
+ * Estructura de un archivo adjunto en un requerimiento.
+ */
 type Adjunto = {
     nombre: string
     tipo: string
     data: string
 }
 
+/**
+ * Estructura completa de un requerimiento.
+ */
 type Req = {
     id: string
     titulo: string
@@ -21,15 +27,42 @@ type Req = {
     adjuntos: Adjunto[]
 }
 
+/**
+ * Página de visualización de resultado/requerimiento.
+ *
+ * Funcionalidades:
+ * - Carga y muestra el requerimiento por ID
+ * - Renderiza el contenido formateado con estilos
+ * - Muestra vista previa de adjuntos (imágenes, PDFs, videos, documentos Office)
+ * - Permite descargar el requerimiento como PDF generado con jsPDF
+ * - Muestra línea de tiempo visual del estado (Creado → En validación → Enviado)
+ *
+ * @component
+ */
 export default function Resultado() {
 
     const { id } = useParams()
     const navigate = useNavigate()
 
+    /**
+     * Datos del requerimiento cargado desde la BD.
+     */
     const [requerimiento, setRequerimiento] = useState<Req | null>(null)
+
+    /**
+     * URL de imagen para mostrar en modal de vista previa.
+     */
     const [imagenPreview, setImagenPreview] = useState<string | null>(null)
+
+    /**
+     * URL de PDF para mostrar en modal de vista previa (no utilizado actualmente).
+     */
     const [pdfPreview, setPdfPreview] = useState<string | null>(null)
 
+    /**
+     * Carga el requerimiento al montar el componente o cambiar el ID.
+     * Llama a la API GET /requerimientos/:id.
+     */
     useEffect(() => {
 
         if (!id) return
@@ -44,6 +77,21 @@ export default function Resultado() {
 
     }, [id])
 
+    /**
+     * Limpia el HTML del contenido del requerimiento para convertirlo a texto plano.
+     * Elimina marcas de plantilla, reemplaza etiquetas por saltos de línea o símbolos.
+     * Usado como paso intermedio antes de generar el PDF.
+     *
+     * Transformaciones:
+     * - Elimina "Plantilla Final Generada - ..." y "Título del requerimiento: ..."
+     * - <br> → \n
+     * - </p> → \n\n
+     * - <li> → "• "
+     * - Elimina todas las demás etiquetas HTML
+     *
+     * @param {string} html - Contenido HTML del requerimiento
+     * @returns {string} Texto plano limpio y formateado
+     */
     function limpiarHTML(html: string) {
 
         return html
@@ -94,6 +142,25 @@ export default function Resultado() {
 
 
     // DESCARGAR PDF
+
+    /**
+     * Genera y descarga unPDF del requerimiento usando jsPDF.
+     *
+     * Estructura del PDF:
+     * 1. Título del requerimiento (centrado, tamaño 18)
+     * 2. Línea separadora
+     * 3. Información básica: ID, Estado, Título
+     * 4. Contenido detallado (procesado por limpiarHTML)
+     *    - Detecta títulos de sección y los marca en negrita
+     *    - Maneja saltos de página automáticamente
+     * 5. Pie de página con número de página y nombre del sistema
+     *
+     * Manejo de páginas:
+     * - Verifica `y > pageHeight - 20` para agregar página nueva
+     * - Añade pie de página a cada hoja
+     *
+     * @returns {void} Descarga el archivo PDF automáticamente
+     */
     function descargarPDF() {
 
 
@@ -230,6 +297,11 @@ export default function Resultado() {
     }
 
 
+    /**
+     * Retorna un emoji representativo según el tipo MIME del archivo.
+     * @param {string} tipo - Tipo MIME del archivo (ej: 'application/pdf')
+     * @returns {string} Emoji correspondiente al tipo de archivo
+     */
     function obtenerIcono(tipo: string) {
 
         if (tipo.includes("pdf")) return "📄"
@@ -244,6 +316,13 @@ export default function Resultado() {
     }
 
 
+    /**
+     * Abre un archivo (PDF, imagen, documento) en una nueva pestaña.
+     * Decodifica el contenido base64 y crea una URL de objeto (blob).
+     * @param {string} tipo - Tipo MIME del archivo
+     * @param {string} base64 - Contenido del archivo en base64
+     * @returns {void} Abre el archivo en nueva ventana
+     */
     function abrirPDF(tipo: string, base64: string) {
 
         const byteCharacters = atob(base64)
