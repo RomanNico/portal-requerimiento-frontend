@@ -85,26 +85,6 @@ export default function Perfil() {
     }
 
 
-    function handleLogout() {
-        // Limpiamos los datos locales directamente
-        localStorage.removeItem("usuario");
-        localStorage.removeItem("rol");
-        localStorage.removeItem("sso_nombre");
-        localStorage.removeItem("sso_correo");
-        localStorage.removeItem("sso_cargo");
-        localStorage.removeItem("sso_area");
-        localStorage.removeItem("sso_centro_costo");
-        localStorage.removeItem("sso_oid");
-
-        const accounts = instance.getAllAccounts();
-        if (esSSO && accounts.length > 0) {
-            // Solo redirigimos a Microsoft si realmente hay una sesión de Microsoft activa
-            instance.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
-        } else {
-            // Para usuarios locales o si no hay cuenta de MSAL, volvemos al login directamente
-            window.location.href = "/";
-        }
-    }
 
     const nombreMostrado = perfil?.nombre || perfil?.usuario || "Usuario";
     const iniciales = nombreMostrado.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase();
@@ -115,13 +95,13 @@ export default function Perfil() {
 
             <Navbar />
 
-            <main className="main-content perfil-page">
+            <main className="main-content perfil-page" style={{ marginTop: '30px' }}>
 
-                <section style={{ maxWidth: '950px', margin: '20px auto', borderRadius: '16px', backgroundColor: '#fff', boxShadow: '0 12px 32px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-                    
+                <section style={{ maxWidth: '950px', margin: '0 auto', borderRadius: '16px', backgroundColor: '#fff', boxShadow: '0 12px 32px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+
                     {/* Gradient Banner Top - Height increased for Name */}
-                    <div style={{ 
-                        height: '120px', 
+                    <div style={{
+                        height: '120px',
                         background: 'linear-gradient(135deg, #0d3b66 0%, #00a4ef 100%)',
                         display: 'flex',
                         alignItems: 'flex-end',
@@ -133,10 +113,10 @@ export default function Perfil() {
                     </div>
 
                     <div style={{ padding: '0 40px 40px' }}>
-                        
+
                         {/* Avatar and Info - Adjusted for inner name logic */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '30px', marginTop: '-65px', paddingBottom: '30px', borderBottom: '1px solid #eef2f6' }}>
-                            
+
                             {/* Avatar Circle */}
                             <div style={{ width: '130px', height: '130px', borderRadius: '50%', backgroundColor: '#0077b6', background: 'linear-gradient(135deg, #0077b6 0%, #00b4d8 100%)', border: '6px solid #fff', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px', fontWeight: '800', boxShadow: '0 8px 24px rgba(0, 119, 182, 0.25)', flexShrink: 0 }}>
                                 {iniciales || "U"}
@@ -166,7 +146,7 @@ export default function Perfil() {
 
                         {/* Detailed Info Grid - 2 or 3 Columns Horizontal */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginTop: '35px' }}>
-                            
+
                             <div style={{ padding: '20px', backgroundColor: '#fcfcfd', borderRadius: '12px', border: '1px solid #ebeef5' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                                     <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -199,10 +179,10 @@ export default function Perfil() {
                                 <div style={{ fontSize: '15px', color: '#0f172a', fontWeight: '600', marginLeft: '44px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     {esSSO && (
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" width="16" height="16">
-                                            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
-                                            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
-                                            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
-                                            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+                                            <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                                            <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                                            <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                                            <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
                                         </svg>
                                     )}
                                     {esSSO ? "Microsoft SSO" : "Autorización Local"}
@@ -211,36 +191,6 @@ export default function Perfil() {
 
                         </div>
 
-                        {/* BOTÓN CERRAR SESIÓN */}
-                        <div style={{ marginTop: '45px', display: 'flex', justifyContent: 'flex-end' }}>
-                            <button
-                                onClick={handleLogout}
-                                style={{ 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    gap: '10px', 
-                                    padding: '10px 28px', 
-                                    fontSize: '14px', 
-                                    fontWeight: '600', 
-                                    backgroundColor: '#fff', 
-                                    color: '#ef4444', 
-                                    border: '1px solid #fecaca', 
-                                    borderRadius: '50px', 
-                                    cursor: 'pointer', 
-                                    transition: 'all 0.2s ease',
-                                    boxShadow: '0 2px 10px rgba(239, 68, 68, 0.05)'
-                                }}
-                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fef2f2';  e.currentTarget.style.borderColor = '#fca5a5'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fff'; e.currentTarget.style.borderColor = '#fecaca'; }}
-                            >
-                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
-                                    <polyline points="16 17 21 12 16 7"></polyline>
-                                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                                </svg>
-                                Cerrar sesión
-                            </button>
-                        </div>
 
                     </div>
                 </section>
