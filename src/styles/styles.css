@@ -38,7 +38,8 @@ a {
 
 .login-wrapper {
     width: 850px;
-    height: 450px;
+    min-height: 450px;
+    height: auto;
     background: #fff;
     border-radius: 12px;
     display: flex;
@@ -83,6 +84,8 @@ a {
     border: 1px solid #ddd;
     font-size: 14px;
     transition: 0.2s;
+    width: 100%;
+    display: block;
 }
 
 .login-card input:focus {
@@ -105,9 +108,44 @@ a {
 
 }
 
+.login-card form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-card form button[type="submit"] {
+    width: 100%;
+    display: block;
+    margin-top: 4px;
+}
+
 .login-card button:hover {
     background: #1a6aa0;
     transform: scale(1.05);
+}
+
+.login-separator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0;
+    color: #6b7280;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.login-separator::before,
+.login-separator::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+.login-separator span {
+    padding: 0 6px;
+    background: #fff;
 }
 
 .login-logo {
@@ -2051,7 +2089,7 @@ body.manager #btnEnviarJira {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 40px;
+    padding-top: 10px;
 }
 
 /* TARJETA */
@@ -2070,6 +2108,12 @@ body.manager #btnEnviarJira {
     gap: 30px;
 }
 
+.perfil-top {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+
 /* HEADER HORIZONTAL */
 
 .perfil-header {
@@ -2079,6 +2123,12 @@ body.manager #btnEnviarJira {
     gap: 25px;
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 25px;
+    flex: 0 0 320px;
+    border-bottom: none;
+    border-right: 1px solid #e5e7eb;
+    padding-bottom: 0;
+    padding-right: 25px;
+    justify-content: flex-start;
 }
 
 .perfil-header div {
@@ -2127,6 +2177,7 @@ body.manager #btnEnviarJira {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+    flex: 1;
 }
 
 /* ITEM */
@@ -2538,4 +2589,363 @@ body.manager #btnEnviarJira {
         grid-template-columns: 1fr;
     }
 
+}
+
+/* ==========================================================================
+   NUEVAS FUNCIONALIDADES (MODO OSCURO Y ROLES)
+   ========================================================================== */
+
+[data-theme='dark'] body { background-color: #0f172a !important; color: #f8fafc !important; }
+[data-theme='dark'] .login-wrapper, [data-theme='dark'] .action-card, [data-theme='dark'] .preview-card, [data-theme='dark'] .req-toolbar, [data-theme='dark'] .req-row, [data-theme='dark'] .val-card.jira, [data-theme='dark'] .validation-panel, [data-theme='dark'] .perfil-card, [data-theme='dark'] .perfil-item, [data-theme='dark'] .doc-pro-view, [data-theme='dark'] .result-card, [data-theme='dark'] .archivo-card { background-color: #1e293b !important; border-color: #334155 !important; color: #f8fafc !important; box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important; }
+[data-theme='dark'] .main-header { background: linear-gradient(135deg, #1e3a8a, #0f172a) !important; }
+
+/* Títulos en Azul Vibrante (Según referencia visual) */
+[data-theme='dark'] .intro h1, 
+[data-theme='dark'] .page-header h1,
+[data-theme='dark'] .action-card .content h3 { 
+    color: #3b82f6 !important; 
+}
+
+[data-theme='dark'] .val-card-title, 
+[data-theme='dark'] .perfil-header h2, 
+[data-theme='dark'] .perfil-item span, 
+[data-theme='dark'] .doc-section,
+[data-theme='dark'] #perfilCorreo,
+[data-theme='dark'] #perfilUsuario { color: #ffffff !important; }
+
+[data-theme='dark'] .intro p, [data-theme='dark'] .action-card .content p, [data-theme='dark'] .req-meta, [data-theme='dark'] .subtitle, [data-theme='dark'] .perfil-item label, [data-theme='dark'] .perfil-header p { color: #cbd5e1 !important; }
+[data-theme='dark'] input, [data-theme='dark'] select, [data-theme='dark'] textarea { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
+
+/* Chatbot Ajustado: Solo Burbujas Bot y Barra de Entrada */
+[data-theme='dark'] .message.bot .message-content { 
+    background-color: #334155 !important; 
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+}
+
+[data-theme='dark'] .chat-input-area,
+[data-theme='dark'] .input-box {
+    background-color: #1e293b !important;
+    border-color: #475569 !important;
+}
+
+[data-theme='dark'] hr { border-color: #334155 !important; opacity: 0.3; }
+
+/* ==========================================================================
+   ETIQUETAS Y TEXTO DE ROL
+   ========================================================================== */
+
+.perfil-user-role {
+    color: #e74c3c !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 15px;
+    margin-top: 2px;
+}
+
+/* Theme Button */
+.theme-toggle {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: white !important;
+    cursor: pointer;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px !important;
+    transition: all 0.3s;
+}
+
+.theme-toggle:hover {
+    background: rgba(255,255,255,0.2) !important;
+    transform: rotate(15deg);
+}
+
+
+/* =========================
+   SSO / MICROSOFT LOGIN
+========================= */
+
+/* Botón principal SSO */
+.btn-sso {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 24px;
+    background: #ffffff;
+    color: #333;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-top: 8px;
+}
+
+.btn-sso:hover:not(:disabled) {
+    background: #f8f9ff;
+    border-color: #0078d4;
+    box-shadow: 0 4px 16px rgba(0, 120, 212, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-sso:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.btn-sso:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sso-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sso-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Spinner de carga SSO */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
+    border-top-color: #0078d4;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mensaje de error login */
+.login-error {
+    background: #fff0f0;
+    color: #c0392b;
+    border: 1px solid #f5c6cb;
+    border-left: 4px solid #e74c3c;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+/* Info footer login */
+.login-info {
+    text-align: center;
+    color: #aaa;
+    font-size: 12px;
+    margin-top: 14px;
+}
+
+/* =========================
+   PERFIL - SSO
+========================= */
+
+/* Avatar con iniciales en Perfil */
+.perfil-avatar-iniciales {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2282bf, #273c75);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 16px rgba(34, 130, 191, 0.35);
+    margin-bottom: 8px;
+}
+
+.perfil-card {
+    background: #fff;
+    width: 100%;
+    max-width: 980px;
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.perfil-top {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+.perfil-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    flex: 0 0 340px;
+    padding-right: 25px;
+    border-right: 1px solid #e5e7eb;
+}
+
+.perfil-user-role {
+    display: inline-block;
+    background: linear-gradient(135deg, #2282bf, #273c75);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+.perfil-rol {
+    display: inline-block;
+    margin-top: 6px;
+    background: linear-gradient(135deg, #2282bf, #273c75);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.perfil-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+}
+
+.perfil-item {
+    background: #f8fafc;
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    transition: 0.2s;
+}
+
+.perfil-item:hover {
+    border-color: #2282bf;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.perfil-item label {
+    font-size: 12px;
+    color: #6b7280;
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.perfil-item span {
+    font-size: 15px;
+    font-weight: 500;
+    color: #111827;
+}
+
+/* Badge SSO Microsoft */
+.sso-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0f7ff;
+    border: 1px solid #bdd7f5;
+    color: #0078d4;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* Botón secundario */
+.btn-secondary {
+    background: transparent;
+    border: 1.5px solid #d1d5db;
+    color: #374151;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: #fff5f5;
+}
+
+/* Avatar con iniciales en Navbar */
+.nav-avatar-iniciales {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fffa65, #f7b731);
+    color: #273c75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-avatar-iniciales:hover {
+    transform: scale(1.12);
+    border-color: #fffa65;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Perfil page layout */
+.perfil-page {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 40px;
+}
+
+@media (max-width: 900px) {
+    .perfil-top {
+        flex-direction: column;
+    }
+
+    .perfil-header {
+        flex: 1 1 auto;
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+        padding-right: 0;
+        padding-bottom: 25px;
+        justify-content: center;
+    }
+
+    .perfil-body {
+        grid-template-columns: 1fr;
+    }
 }

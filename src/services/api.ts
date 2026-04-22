@@ -1,7 +1,18 @@
 export const API_URL = "http://localhost:3000";
 
-// LOGIN
+// ─── LOGIN SSO (Azure AD) ────────────────────────────────────────────────
+export async function ssoLogin(idToken: string) {
+    const res = await fetch(`${API_URL}/sso-login`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${idToken}`,
+            "Content-Type": "application/json"
+        }
+    });
+    return res.json();
+}
 
+// LOGIN TRADICIONAL (mantenido para compatibilidad)
 export async function login(usuario: string, password: string) {
 
     const res = await fetch(`${API_URL}/login`, {

@@ -96,6 +96,9 @@ function App() {
           }
         />
 
+        {/* Fallback: evita pantalla en blanco si MSAL retorna con #code=... */}
+        <Route path="/*" element={<Login />} />
+
       </Routes>
 
     </HashRouter>
